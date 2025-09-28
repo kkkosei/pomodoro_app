@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import StartButton from "./components/StartButton";
 import "./App.css"
 
 function App() {
@@ -23,15 +24,15 @@ function App() {
   const minutes = Math.floor(time / 60);
   const seconds = String(time % 60).padStart(2, "0");
 
+
   return (
     <div className="App">
 
       <CountdownCircleTimer className="timer-wrapper"
         isPlaying={isRunning}
-        duration={25 * 60}
-        initialRemainingTime={time}
+        duration={time}
         colors={["#004777", "#F7B801", "#A30000"]}
-        colorsTime={[7, 5, 2]}
+        colorsTime={[1500, 600, 300]}
         strokeWidth={20}
         size={240}
       >
@@ -42,10 +43,13 @@ function App() {
         )}
       </CountdownCircleTimer>
 
-      <div className="buttons">
-        <button className="button" onClick={() => setIsRunning(true)}>スタート</button>
-        <button className="button" onClick={() => setIsRunning(false)}>ストップ</button>
-      </div>
+      <StartButton 
+        isRunning={isRunning} 
+        css={"button"} 
+        onClickStart={() => setIsRunning(true)} 
+        onClickStop={() => setIsRunning(false)}
+      />
+
     </div>
   );
 }
