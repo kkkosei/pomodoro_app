@@ -7,8 +7,6 @@ function App() {
   const [time, setTime] = useState(25 * 60); // 25分
   // 再生中かどうか
   const [isRunning, setIsRunning] = useState(false);
-  // リセット用のキー
-  const [key, setKey] = useState(0);
 
   // useEffect で1秒ごとに減らす処理
   useEffect(() => {
@@ -25,18 +23,10 @@ function App() {
   const minutes = Math.floor(time / 60);
   const seconds = String(time % 60).padStart(2, "0");
 
-  // リセット処理
-  const resetTimer = () => {
-    setTime(25 * 60);
-    setKey((prev) => prev + 1); // CountdownCircleTimerを再描画
-    setIsRunning(false);
-  };
-
   return (
     <div className="App">
 
       <CountdownCircleTimer className="timer-wrapper"
-        key={key}
         isPlaying={isRunning}
         duration={25 * 60}
         initialRemainingTime={time}
@@ -55,7 +45,6 @@ function App() {
       <div className="buttons">
         <button className="button" onClick={() => setIsRunning(true)}>スタート</button>
         <button className="button" onClick={() => setIsRunning(false)}>ストップ</button>
-        <button className="button" onClick={resetTimer}>リセット</button>
       </div>
     </div>
   );
