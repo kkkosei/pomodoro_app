@@ -18,10 +18,12 @@
 }
 
 .button {
+  margin-top: 10px; 
   border: 2px solid black; 
   border-radius: 6px;   
 }
 
-button:hover {
-  border-color: red;       /* ← ホバーしたら赤に変化 */
+.button:active {
+  transform: translateY(2px); /* 押したら下に2px動く */
+  box-shadow: 0 2px #666;     /* 影を浅くする */
 }

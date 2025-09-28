@@ -46,7 +46,7 @@ function App() {
       <StartButton 
         isRunning={isRunning} 
         css={"button"} 
-        onClickStart={() => setIsRunning(true)} 
+        onClickStart={() =>  setIsRunning(true)} 
         onClickStop={() => setIsRunning(false)}
       />
 
