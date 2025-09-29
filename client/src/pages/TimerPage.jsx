@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import StartButton from "../components/StartButton";
-import "../App.css"
+import "./TimerPage.css"
 
 function TimerPage() {
   // 残り時間（秒）
@@ -52,7 +52,7 @@ function TimerPage() {
   const seconds = String(time % 60).padStart(2, "0");
 
   return (
-    <div className="App">
+    <div className="TimerPage">
       
 
       <h1> {cycleCount} {mode} </h1>
