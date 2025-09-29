@@ -23,28 +23,27 @@ function App() {
           if (t > 0) {//timerの時間がまだある場合
             return t - 1;
           } else {//timer終了後の動作
-
             clearInterval(timer);
             if (mode === "work") {//作業中の場合
 
               if ((cycleCount) % 4 === 0) {
-                setMode("break20");
+                setMode("break15");
                 return 1 * 60;
               } else {
-                setMode("break10");
+                setMode("break5");
                 return 1 * 60;
               }
+
             } else {//休憩中の場合
               setCycleCount(c => c + 1);
               setMode("work");
               return 1 * 60;
             }
           }
-          
         });
-        
       }, 1000);
     }
+
     return () => clearInterval(timer);
   }, [isRunning, mode, cycleCount]);
 
