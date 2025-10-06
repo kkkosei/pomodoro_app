@@ -1,41 +1,66 @@
 import React, { useState, useEffect } from "react";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import StartButton from "../components/StartButton";
-import "./TimerPage.css"
+import "./TimerPage.css";
 
 function TimerPage() {
   // 残り時間（秒）
-  const [time, setTime] = useState(1 * 60); // 30分
+  const [time, setTime] = useState(1 * 60);
   // 再生中かどうか
   const [isRunning, setIsRunning] = useState(false);
-  // 休憩中かどうか
+  // モード
   const [mode, setMode] = useState("work"); // work, break5, break15
-  const [cycleCount, setCycleCount] = useState(1); // 何回目の作業か
+  const [cycleCount, setCycleCount] = useState(1);
 
-  // useEffect で1秒ごとに減らす処理
+  // ✅ Todo関連
+  const [todos, setTodos] = useState(() => {
+    const saved = localStorage.getItem("todos");
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [newTodo, setNewTodo] = useState("");
+
+  const addTodo = () => {
+    if (newTodo.trim() === "") return;
+    setTodos([...todos, { text: newTodo, completed: false }]);
+    setNewTodo("");
+  };
+
+  const toggleTodo = (index) => {
+    setTodos((prev) =>
+      prev.map((todo, i) =>
+        i === index ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const deleteTodo = (index) => {
+    setTodos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos]);
+
+  // ✅ タイマー
   useEffect(() => {
     let timer;
-    if (isRunning) {//タイマーが作動中かどうか
+    if (isRunning) {
       timer = setInterval(() => {
-
         setTime((t) => {
-
-          if (t > 0) {//timerの時間がまだある場合
+          if (t > 0) {
             return t - 1;
-          } else {//timer終了後の動作
+          } else {
             clearInterval(timer);
-            if (mode === "work") {//作業中の場合
-
-              if ((cycleCount) % 4 === 0) {
+            if (mode === "work") {
+              if (cycleCount % 4 === 0) {
                 setMode("break15");
                 return 1 * 60;
               } else {
                 setMode("break5");
                 return 1 * 60;
               }
-
-            } else {//休憩中の場合
-              setCycleCount(c => c + 1);
+            } else {
+              setCycleCount((c) => c + 1);
               setMode("work");
               return 1 * 60;
             }
@@ -43,7 +68,6 @@ function TimerPage() {
         });
       }, 1000);
     }
-
     return () => clearInterval(timer);
   }, [isRunning, mode, cycleCount]);
 
@@ -52,34 +76,69 @@ function TimerPage() {
   const seconds = String(time % 60).padStart(2, "0");
 
   return (
-    <div className="TimerPage">
-      
+    <div className="timer-todo-container">
+      {/* ===== 左：タイマーエリア ===== */}
+      <div className="timer-section">
+        <h1>
+          {cycleCount} {mode}
+        </h1>
 
-      <h1> {cycleCount} {mode} </h1>
-      <CountdownCircleTimer className="timer-wrapper"
-        key={mode}
-        isPlaying={isRunning}
-        duration={mode === "work" ? 1 * 60 : mode === "break10" ? 1 * 60 : 1 * 60}
-        colors={["#004777", "#F7B801", "#A30000"]}
-        colorsTime={[1500, 600, 300]}
-        strokeWidth={20}
-        size={240}
-      >
-        {() => (
-          <div style={{ fontSize: "32px" }}>
-            {minutes}:{seconds}
-          </div>
-        )}
-      </CountdownCircleTimer>
+        <CountdownCircleTimer
+          className="timer-wrapper"
+          key={mode}
+          isPlaying={isRunning}
+          duration={mode === "work" ? 1 * 60 : 1 * 60}
+          colors={["#004777", "#F7B801", "#A30000"]}
+          colorsTime={[1500, 600, 300]}
+          strokeWidth={20}
+          size={240}
+        >
+          {() => (
+            <div style={{ fontSize: "32px" }}>
+              {minutes}:{seconds}
+            </div>
+          )}
+        </CountdownCircleTimer>
 
-      <StartButton 
-        isRunning={isRunning} 
-        css={"button"} 
-        onClickStart={() =>  setIsRunning(true)} 
-        onClickStop={() => setIsRunning(false)}
-      />
+        <StartButton
+          isRunning={isRunning}
+          css={"button"}
+          onClickStart={() => setIsRunning(true)}
+          onClickStop={() => setIsRunning(false)}
+        />
+      </div>
 
+      {/* ===== 右：Todoエリア ===== */}
+      <div className="todo-section">
+        <h2>📝 Todoリスト</h2>
+        <div className="input-area">
+          <input
+            type="text"
+            placeholder="タスクを入力..."
+            value={newTodo}
+            onChange={(e) => setNewTodo(e.target.value)}
+          />
+          <button onClick={addTodo}>追加</button>
+        </div>
+
+        <ul className="todo-list">
+          {todos.map((todo, index) => (
+            <li key={index} className={todo.completed ? "completed" : ""}>
+              <input
+                type="checkbox"
+                checked={todo.completed}
+                onChange={() => toggleTodo(index)}
+              />
+              <span>{todo.text}</span>
+              <button className="delete-btn" onClick={() => deleteTodo(index)}>
+                ❌
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
+
 export default TimerPage;
