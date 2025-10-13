@@ -5,7 +5,7 @@ import "./TimerPage.css";
 
 function TimerPage() {
   // 残り時間（秒）
-  const [time, setTime] = useState(1 * 60);
+  const [time, setTime] = useState(25 * 60);
   // 再生中かどうか
   const [isRunning, setIsRunning] = useState(false);
   // モード
