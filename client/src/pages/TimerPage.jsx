@@ -108,7 +108,7 @@ function TimerPage() {
 
         <StartButton 
           isRunning={isRunning}
-          css={"button"}
+          css={"timer-button"}
           onClickStart={() => setIsRunning(true)}
           onClickStop={() => setIsRunning(false)}
         />
@@ -124,7 +124,7 @@ function TimerPage() {
             value={newTodo}
             onChange={(e) => setNewTodo(e.target.value)}
           />
-          <button onClick={addTodo}>追加</button>
+          <button className="add-button" onClick={addTodo}>追加</button>
         </div>
 
         <ul className="todo-list">
