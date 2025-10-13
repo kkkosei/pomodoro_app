@@ -12,7 +12,7 @@ function TimerPage() {
   const [mode, setMode] = useState("work"); // work, break5, break15
   const [cycleCount, setCycleCount] = useState(1);
 
-  // ✅ Todo関連
+  // Todo
   const [todos, setTodos] = useState(() => {
     const saved = localStorage.getItem("todos");
     return saved ? JSON.parse(saved) : [];
@@ -41,7 +41,7 @@ function TimerPage() {
     localStorage.setItem("todos", JSON.stringify(todos));
   }, [todos]);
 
-  // ✅ タイマー
+  // タイマー
   useEffect(() => {
     let timer;
     if (isRunning) {
@@ -54,15 +54,15 @@ function TimerPage() {
             if (mode === "work") {
               if (cycleCount % 4 === 0) {
                 setMode("break15");
-                return 1 * 60;
+                return 15 * 60;
               } else {
                 setMode("break5");
-                return 1 * 60;
+                return 5 * 60;
               }
             } else {
               setCycleCount((c) => c + 1);
               setMode("work");
-              return 1 * 60;
+              return 25 * 60;
             }
           }
         });
@@ -77,7 +77,7 @@ function TimerPage() {
 
   return (
     <div className="timer-todo-container">
-      {/* ===== 左：タイマーエリア ===== */}
+      {/*ポモドロータイマー*/}
       <div className="timer-section">
         <h1>
           {cycleCount} {mode}
@@ -87,7 +87,13 @@ function TimerPage() {
           className="timer-wrapper"
           key={mode}
           isPlaying={isRunning}
-          duration={mode === "work" ? 1 * 60 : 1 * 60}
+          duration={
+            mode === "work"
+              ? 25 * 60
+              : mode === "break5"
+              ? 5 * 60
+              : 15 * 60
+          }
           colors={["#004777", "#F7B801", "#A30000"]}
           colorsTime={[1500, 600, 300]}
           strokeWidth={20}
@@ -108,7 +114,7 @@ function TimerPage() {
         />
       </div>
 
-      {/* ===== 右：Todoエリア ===== */}
+      {/* todoリスト */}
       <div className="todo-section">
         <h2>📝 Todoリスト</h2>
         <div className="input-area">
