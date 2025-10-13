@@ -87,5 +87,15 @@ input[type="text"] {
 }
 
 .login-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #004777;
+  color: white;
+  cursor: pointer;
+  margin-top: 10px; 
+  border: 2px solid black; 
+}
 
+.login-btn:hover {
+  background-color: #00325d; 
 }
