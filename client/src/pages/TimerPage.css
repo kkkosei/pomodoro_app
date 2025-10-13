@@ -38,6 +38,8 @@ button {
   background-color: #004777;
   color: white;
   cursor: pointer;
+  margin-top: 10px; 
+  border: 2px solid black; 
 }
 
 button:hover {

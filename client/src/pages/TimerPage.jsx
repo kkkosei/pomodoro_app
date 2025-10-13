@@ -106,7 +106,7 @@ function TimerPage() {
           )}
         </CountdownCircleTimer>
 
-        <StartButton
+        <StartButton 
           isRunning={isRunning}
           css={"button"}
           onClickStart={() => setIsRunning(true)}
