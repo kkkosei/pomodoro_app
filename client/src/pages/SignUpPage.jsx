@@ -44,9 +44,10 @@ function SignUpPage() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            
           />
         </label>
-        <label>
+        <label >
           Email
           <input
             type="email"
@@ -56,7 +57,7 @@ function SignUpPage() {
             required
           />
         </label>
-        <label>
+        <label >
           Password
           <input
             type="password"
@@ -66,6 +67,7 @@ function SignUpPage() {
             required
           />
         </label>
+
         <button type="submit" disabled={loading}>
           {loading ? "送信中..." : "Sign Up"}
         </button>
@@ -73,7 +75,7 @@ function SignUpPage() {
 
       <p style={{ marginTop: "10px" }}>
         すでにアカウントをお持ちですか？{" "}
-        <a href="/signin">Sign inはこちら</a>
+        <a href="/login">Sign inはこちら</a>
       </p>
     </div>
   );
