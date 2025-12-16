@@ -1,7 +1,5 @@
 import express from "express";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import db from "../config/db.js";
+import { supabase } from "../config/supabase.js";
 
 const router = express.Router();
 
@@ -9,19 +7,20 @@ const router = express.Router();
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    const hash = await bcrypt.hash(password, 10);
 
-    const query = `
-      INSERT INTO users (username, email, password_hash)
-      VALUES ($1, $2, $3)
-      RETURNING user_id;
-    `;
-    const result = await db.query(query, [username, email, hash]);
+    const { data, error } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      user_metadata: { username },
+    });
 
-    res.json({ message: "登録成功", user_id: result.rows[0].user_id });
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    res.json({ message: "登録成功", user: data.user });
   } catch (err) {
-    console.error("登録エラー:", err);
-    res.status(500).json({ error: "登録に失敗しました" });
+    res.status(500).json({ error: "登録エラー" });
   }
 });
 
@@ -30,41 +29,42 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const result = await db.query(
-      "SELECT * FROM users WHERE email = $1",
-      [email]
-    );
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-    if (result.rows.length === 0)
-      return res.status(401).json({ error: "ユーザーが存在しません" });
+    if (error) {
+      return res.status(401).json({ error: "ログイン失敗" });
+    }
 
-    const user = result.rows[0];
-    const match = await bcrypt.compare(password, user.password_hash);
-    if (!match)
-      return res.status(401).json({ error: "パスワードが違います" });
+    // セッションにユーザー情報を保存
+    req.session.user = {
+      id: data.user.id,
+      email: data.user.email,
+      username: data.user.user_metadata?.username,
+    };
 
-    const token = jwt.sign(
-      { id: user.user_id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    res.json({ message: "ログイン成功", token });
+    res.json({ message: "ログイン成功", user: data.user });
   } catch (err) {
-    console.error("ログインエラー:", err);
-    res.status(500).json({ error: "ログインに失敗しました" });
+    res.status(500).json({ error: "ログインエラー" });
   }
 });
 
-// 認証チェック
+// プロフィール取得
 router.get("/profile", (req, res) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (!token) return res.status(401).json({ error: "トークンがありません" });
+  if (!req.session.user) {
+    return res.status(401).json({ error: "認証が必要です" });
+  }
+  res.json({ user: req.session.user });
+});
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: "トークンが無効です" });
-    res.json({ user });
+// ログアウト
+router.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) return res.status(500).json({ error: "ログアウト失敗" });
+    res.clearCookie("connect.sid");
+    res.json({ message: "ログアウト成功" });
   });
 });
 
