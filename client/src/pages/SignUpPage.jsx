@@ -1,32 +1,39 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function SignUpPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
 
     try {
-      const res = await fetch("http://localhost:4000/api/register", {
+      const response = await fetch("http://localhost:4000/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ username, email, password }),
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        alert("登録成功！ログインしてください。");
-        window.location.href = "/signin"; // 登録後にSign inへ
-      } else {
-        alert(data.error || "登録に失敗しました。");
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "登録に失敗しました");
+        return;
       }
-    } catch (error) {
-      console.error("登録エラー:", error);
-      alert("サーバーに接続できませんでした。");
+
+      alert("登録成功！ログインページにリダイレクトします");
+      navigate("/login");
+    } catch (err) {
+      console.error("ログインエラー:", err);
+      setError("エラーが発生しました");
     } finally {
       setLoading(false);
     }
@@ -35,6 +42,7 @@ function SignUpPage() {
   return (
     <div style={{ maxWidth: "400px", margin: "auto", padding: "20px" }}>
       <h2>Sign Up</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSignUp}>
         <label>
           Username
@@ -44,10 +52,9 @@ function SignUpPage() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            
           />
         </label>
-        <label >
+        <label>
           Email
           <input
             type="email"
@@ -57,7 +64,7 @@ function SignUpPage() {
             required
           />
         </label>
-        <label >
+        <label>
           Password
           <input
             type="password"
